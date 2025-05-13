@@ -1,0 +1,169 @@
+class Expense {
+    double amount;
+    String category;
+    boolean isRecurring;
+
+    void addExpense(User user) {
+        if (user == null) return;
+
+        System.out.print("Enter expense amount: ");
+        while (!User.input.hasNextDouble()) {
+            System.out.println("Invalid input.");
+            User.input.next();
+        }
+        amount = User.input.nextDouble();
+        User.input.nextLine();
+
+        System.out.print("Enter category: ");
+        category = User.input.nextLine();
+
+        System.out.print("Is it recurring? (yes/no): ");
+        String response = User.input.nextLine().toLowerCase();
+        isRecurring = response.equals("yes");
+
+        String filename = "expense_" + user.userId + ".txt";
+
+        List<String> expenseData = Arrays.asList(
+            "Amount: " + amount,
+            "Category: " + category,
+            "IsRecurring: " + isRecurring,
+            "---------------"
+        );
+
+        try {
+            Files.write(Paths.get(filename), expenseData, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            System.out.println("Expense added.");
+        } catch (IOException e) {
+            System.out.println("Error saving expense.");
+        }
+    }
+}
+
+class Budget {
+    double amount;
+    String category;
+
+    void createBudget(User user) {
+        if (user == null) return;
+
+        System.out.print("Enter budget category: ");
+        category = User.input.nextLine();
+
+        System.out.print("Enter budget amount: ");
+        while (!User.input.hasNextDouble()) {
+            System.out.println("Invalid input.");
+            User.input.next();
+        }
+        amount = User.input.nextDouble();
+        User.input.nextLine();
+
+        String filename = "budget_" + user.userId + ".txt";
+
+        List<String> budgetData = Arrays.asList(
+            "Category: " + category,
+            "Amount: " + amount,
+            "---------------"
+        );
+
+        try {
+            Files.write(Paths.get(filename), budgetData, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            System.out.println("Budget created.");
+        } catch (IOException e) {
+            System.out.println("Error saving budget.");
+        }
+    }
+
+    void viewBudgets(User user) {
+        if (user == null) return;
+
+        String filename = "budget_" + user.userId + ".txt";
+
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(filename));
+            if (lines.isEmpty()) {
+                System.out.println("No budgets created yet.");
+            } else {
+                for (String line : lines) {
+                    System.out.println(line);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading budget data.");
+        }
+    }
+
+    void analyzeSpending(User user) {
+        if (user == null) return;
+
+        String budgetFile = "budget_" + user.userId + ".txt";
+        String expenseFile = "expense_" + user.userId + ".txt";
+
+        try {
+            List<String> budgetLines = Files.readAllLines(Paths.get(budgetFile));
+            List<String> expenseLines = Files.readAllLines(Paths.get(expenseFile));
+
+            double totalBudget = 0;
+            double totalSpent = 0;
+
+            for (String line : budgetLines) {
+                if (line.startsWith("Amount: ")) {
+                    totalBudget += Double.parseDouble(line.substring(8).trim());
+                }
+            }
+
+            for (String line : expenseLines) {
+                if (line.startsWith("Amount: ")) {
+                    totalSpent += Double.parseDouble(line.substring(8).trim());
+                }
+            }
+
+            System.out.println("Total Budget: " + totalBudget);
+            System.out.println("Total Spent: " + totalSpent);
+
+
+if (totalSpent > totalBudget) {
+                System.out.println(" You are over budget!");
+            } else {
+                System.out.println("You are within budget.");
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error analyzing spending.");
+        }
+    }
+}
+
+class Transaction {
+    String description;
+    String date;
+    String time;
+
+    void createTransaction(User user) {
+        if (user == null) return;
+
+        System.out.print("Enter description: ");
+        description = User.input.nextLine();
+
+        System.out.print("Enter due date (YYYY-MM-DD): ");
+        date = User.input.nextLine();
+
+        System.out.print("Enter due time (HH:MM): ");
+        time = User.input.nextLine();
+
+        String filename = "transaction_" + user.userId + ".txt";
+
+        List<String> transactionData = Arrays.asList(
+            "Description: " + description,
+            "Date: " + date,
+            "Time: " + time,
+            "---------------"
+        );
+
+        try {
+            Files.write(Paths.get(filename), transactionData, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            System.out.println("Transaction added.");
+        } catch (IOException e) {
+            System.out.println("Error saving transaction.");
+        }
+    }
+}
