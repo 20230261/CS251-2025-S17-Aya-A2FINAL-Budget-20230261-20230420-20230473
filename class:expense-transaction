@@ -1,0 +1,42 @@
+class Expense {
+    double amount;
+    String category;
+    boolean isRecurring;
+
+    void addExpense(User user) {
+        if (user == null) return;
+
+        System.out.print("Enter expense amount: ");
+        while (!User.input.hasNextDouble()) {
+            System.out.println("Invalid input.");
+            User.input.next();
+        }
+        amount = User.input.nextDouble();
+        User.input.nextLine();
+
+        System.out.print("Enter category: ");
+        category = User.input.nextLine();
+
+        System.out.print("Is it recurring? (yes/no): ");
+        String response = User.input.nextLine().toLowerCase();
+        isRecurring = response.equals("yes");
+
+        String filename = "expense_" + user.userId + ".txt";
+
+        List<String> expenseData = Arrays.asList(
+            "Amount: " + amount,
+            "Category: " + category,
+            "IsRecurring: " + isRecurring,
+            "---------------"
+        );
+
+        try {
+            Files.write(Paths.get(filename), expenseData, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            System.out.println("Expense added.");
+        } catch (IOException e) {
+            System.out.println("Error saving expense.");
+        }
+    }
+}
+
+
