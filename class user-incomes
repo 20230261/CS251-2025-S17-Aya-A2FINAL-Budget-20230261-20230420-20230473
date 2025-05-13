@@ -1,0 +1,124 @@
+class User {
+    static User currentUser = null;
+    static Scanner input = new Scanner(System.in);
+
+    int userId;
+    String name;
+    String email;
+    String password;
+
+    void logout() {
+        currentUser = null;
+        System.out.println("Logged out successfully.");
+    }
+
+    void signup() {
+        System.out.print("Enter Email: ");
+        email = input.nextLine();
+        if (!email.contains("@")) {
+            System.out.println("Invalid email.");
+            return;
+        }
+
+        System.out.print("Enter Username: ");
+        name = input.nextLine();
+
+        System.out.print("Enter Password: ");
+        password = input.nextLine();
+        if (password.length() < 6) {
+            System.out.println("Password too short.");
+            return;
+        }
+
+        userId = (int)(Math.random() * 10000);
+
+        List<String> userData = Arrays.asList(
+            "UserID: " + userId,
+            "Username: " + name,
+            "Email: " + email,
+            "Password: " + password,
+            "---------------"
+        );
+
+        try {
+            Path path = Paths.get("users.txt");
+            Files.write(path, userData, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            System.out.println("Sign-Up Successful!");
+        } catch (IOException e) {
+            System.out.println("Error saving user data.");
+        }
+    }
+
+    void login() {
+        System.out.print("Enter Email: ");
+        String enteredEmail = input.nextLine();
+        System.out.print("Enter Password: ");
+        String enteredPassword = input.nextLine();
+
+        try {
+            Path path = Paths.get("users.txt");
+            List<String> lines = Files.readAllLines(path);
+            boolean found = false;
+
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).startsWith("Email: ")) {
+                    String savedEmail = lines.get(i).substring(7).trim();
+                    String savedPassword = lines.get(i + 1).substring(9).trim();
+                    String savedName = lines.get(i - 1).substring(9).trim();
+                    int savedUserId = Integer.parseInt(lines.get(i - 2).substring(8).trim());
+
+                    if (savedEmail.equals(enteredEmail) && savedPassword.equals(enteredPassword)) {
+                        currentUser = new User();
+                        currentUser.email = savedEmail;
+                        currentUser.password = savedPassword;
+                        currentUser.name = savedName;
+                        currentUser.userId = savedUserId;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (found) System.out.println("Login successful!");
+            else System.out.println("Invalid email or password.");
+        } catch (IOException e) {
+            System.out.println("Error reading user data.");
+        }
+    }
+}
+
+class Income {
+    double amount;
+    boolean isRecurring;
+
+    void addIncome(User user) {
+        if (user == null) return;
+
+        System.out.print("Enter income amount: ");
+        while (!User.input.hasNextDouble()) {
+            System.out.println("Invalid input.");
+            User.input.next();
+        }
+        amount = User.input.nextDouble();
+        User.input.nextLine();
+
+        System.out.print("Is it recurring? (yes/no): ");
+        String response = User.input.nextLine().toLowerCase();
+        isRecurring = response.equals("yes");
+
+        String filename = "income_" + user.userId + ".txt";
+
+        List<String> incomeData = Arrays.asList(
+            "Amount: " + amount,
+            "IsRecurring: " + isRecurring,
+            "---------------"
+        );
+
+        try {
+            Files.write(Paths.get(filename), incomeData, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            System.out.println("Income added.");
+        } catch (IOException e) {
+            System.out.println("Error saving income.");
+        }
+    }
+}
