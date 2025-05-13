@@ -1,3 +1,4 @@
+// class user for signup-login-logout
 class User {
     static User currentUser = null;
     static Scanner input = new Scanner(System.in);
@@ -86,7 +87,7 @@ class User {
         }
     }
 }
-
+//class Income for adding income from user
 class Income {
     double amount;
     boolean isRecurring;
